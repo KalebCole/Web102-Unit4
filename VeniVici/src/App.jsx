@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-// import react bootstrap components
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Row, Col, Container} from "react-bootstrap";
+import { Row, Col, Container } from "react-bootstrap";
 
 import "./App.css";
 
@@ -56,12 +55,10 @@ function History({ history }) {
 
 function App() {
   const [data, setData] = useState(null);
-  const [history, setHistory] = useState([]); //array of objects of previous dog data
-  const [banList, setBanList] = useState([]); //arrays of arrays for each property of the dog
-  const [isBanListShown, setIsBanListShown] = useState(false);
-  const [isHistoryShown, setIsHistoryShown] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [banList, setBanList] = useState([]);
 
-  const URL = "https://pokeapi.co/api/v2/pokemon"; // API endpoint URL
+  const URL = "https://pokeapi.co/api/v2/pokemon";
 
   const addToBanList = (type) => {
     setBanList((prevBanList) => [...prevBanList, type]);
@@ -79,7 +76,6 @@ function App() {
       const response = await fetch(URL + `/${random}`);
       const data = await response.json();
 
-      // Check if any of the Pokemon's types are in the ban list
       const isBanned = data.types.some((type) =>
         banList.includes(type.type.name)
       );
@@ -92,7 +88,7 @@ function App() {
         pokeObj["imageURL"] = data.sprites.front_default;
         pokeObj["height"] = data.height;
         pokeObj["weight"] = data.weight;
-        pokeObj["types"] = data.types.map((type) => type.type.name); // Get all types
+        pokeObj["types"] = data.types.map((type) => type.type.name);
         console.log(pokeObj);
         setData(pokeObj);
       }
@@ -103,60 +99,51 @@ function App() {
 
   useEffect(() => {
     fetchData();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
+
   return (
-    <>
-      <div style={{position: 'relative'}}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {isHistoryShown && (
-  <div>
-    <History history={history} />
-  </div>
-)}
-          <div>
-            <h1>Pokemon Picker</h1>
-            <SearchButton
-              onSearch={fetchData}
-              data={data}
-              setHistory={setHistory}
-              history={history}
-            />
-            <button onClick={() => setIsBanListShown(!isBanListShown)}>
-              Ban List
-            </button>
-            <button onClick={() => setIsHistoryShown(!isHistoryShown)}>
-              History
-            </button>
-            {data && (
-              <div>
-                <h2>{data.name}</h2>
-                <img src={data.imageURL} alt={data.name} />
-                <p>Height: {data.height}</p>
-                <p>Weight: {data.weight}</p>
-                <p>
-                  Types:{" "}
-                  {data.types.map((type, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        if (!banList.includes(type)) {
-                          addToBanList(type);
-                        }
-                      }}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </p>
-              </div>
-            )}
-          </div>
-          {isBanListShown && (
-            <BanList banList={banList} setBanList={setBanList} />
+    <Container fluid>
+      <Row>
+        <Col xs={3} sm={3} md={3} lg={3} xl={3}>
+          <History history={history} />
+        </Col>
+        <Col xs={6} sm={6} md={6} lg={6} xl={6}>
+          <h1>Poke Picker</h1>
+          <SearchButton
+            onSearch={fetchData}
+            data={data}
+            setHistory={setHistory}
+            history={history}
+          />
+          {data && (
+            <div>
+              <h2>{data.name}</h2>
+              <img src={data.imageURL} alt={data.name} />
+              <p>Height: {data.height}</p>
+              <p>Weight: {data.weight}</p>
+              <p>
+                Types:{" "}
+                {data.types.map((type, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      if (!banList.includes(type)) {
+                        addToBanList(type);
+                      }
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </p>
+            </div>
           )}
-        </div>
-      </div>
-    </>
+        </Col>
+        <Col xs={3} sm={3} md={3} lg={3} xl={3}>
+          <BanList banList={banList} setBanList={setBanList} />
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
